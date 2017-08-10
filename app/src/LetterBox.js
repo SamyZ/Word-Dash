@@ -6,20 +6,18 @@ export default class LetterBox extends React.PureComponent {
     letter: string,
     onPress: Function,
     size: number,
+    index: number,
+    active: boolean,
   };
 
-  state = { active: false };
-
   handlePress = () => {
-    const active = !this.state.active;
-    this.props.onPress(this.props.letter, active);
-    this.setState({ active });
+    this.props.onPress(this.props.letter, this.props.index, !this.props.active);
   };
 
   render() {
     return (
       <TouchableHighlight
-        style={currentStyles(this.props.size, this.state.active).container}
+        style={currentStyles(this.props.size, this.props.active).container}
         onPress={this.handlePress}
         underlayColor="powderblue"
       >

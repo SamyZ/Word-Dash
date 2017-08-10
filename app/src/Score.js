@@ -1,8 +1,25 @@
 import React from 'react';
+import uuid from 'react-native-unique-id';
 import { StyleSheet, Text, View } from 'react-native';
+import { find, keys, equals } from 'ramda';
+import moment from 'moment';
+import TimerMixin from 'react-timer-mixin';
 
 export default class Score extends React.PureComponent {
-  props: {};
+  props: {
+    scores: Object,
+    startTime: Object,
+  };
+
+  state = { timeLeft: 60 };
+
+  mixins: [TimerMixin];
+
+  componentDidMount() {
+    setInterval(() => {
+      this.setState({ timeLeft: Math.round(60 - moment().diff(this.props.startTime) / 1000) });
+    }, 100);
+  }
 
   render() {
     return (
@@ -12,7 +29,7 @@ export default class Score extends React.PureComponent {
             {'You'}
           </Text>
           <Text style={styles.selfText}>
-            {100}
+            {this.props.scores.self}
           </Text>
         </View>
         <View style={styles.scoreContainer}>
@@ -20,7 +37,7 @@ export default class Score extends React.PureComponent {
             {'Time left'}
           </Text>
           <Text style={styles.timerText}>
-            {'00:30'}
+            {this.state.timeLeft}
           </Text>
         </View>
         <View style={styles.scoreContainer}>
@@ -28,7 +45,7 @@ export default class Score extends React.PureComponent {
             {'Opponent'}
           </Text>
           <Text style={styles.opponentText}>
-            {300}
+            {this.props.scores.opponent}
           </Text>
         </View>
       </View>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
-
+import { isNil, find, equals } from 'ramda';
 const { width } = Dimensions.get('window');
 
 import LetterBox from './LetterBox';
@@ -9,25 +9,29 @@ const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 const randomLetter = () => LETTERS[Math.floor(Math.random() * LETTERS.length)];
 
-const letterGrid = [];
+const lettersGrid = [];
 for (let i = 0; i < 36; i++) {
-  letterGrid.push(randomLetter());
+  lettersGrid.push(randomLetter());
 }
 
 export default class Grid extends React.PureComponent {
   props: {
     onPress: Function,
+    activeLetters: Array<string>,
+    lettersGrid: Array<string>,
   };
 
   render() {
     return (
       <View style={styles.container}>
-        {letterGrid.map((letter, index) =>
+        {this.props.lettersGrid.map((letter, index) =>
           <LetterBox
             letter={letter}
+            index={index}
             size={Math.floor(width * 0.16)}
             onPress={this.props.onPress}
             key={index}
+            active={!isNil(find(equals(index), this.props.activeLetters))}
           />
         )}
       </View>
