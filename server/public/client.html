@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>socket test client</title>
+  </head>
+  <body>
+    <h1>just use socket in the console!</h1>
+    <button id="start">start</button>
+    <button id="quit">quit</button>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ramda/0.24.1/ramda.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+
+    <script type="text/javascript">
+      const socket = io();
+
+      socket.on('connect', () => {
+        console.log('connected');
+        socket.send({ userId: 'randomtroll' });
+      });
+
+      socket.on('disconnect', () => {
+        console.log('disconnected');
+      });
+
+      socket.on('reconnect', () => {
+        console.log('reconnected');
+      });
+
+      socket.on('game:started', () => { alert('game started!'); });
+
+      socket.on('game:finished', ({ outcome, ownScore, opponentScore }) => {
+        alert('game finished! you ' + outcome + '; your score: ' + ownScore + '; opponent score: ' + opponentScore);
+      });
+
+      $('#start').on('click', socket.emit('game:start'))
+      $('#quit').on('click', socket.emit('game:quit'))
+
+    </script>
+  </body>
+</html>
