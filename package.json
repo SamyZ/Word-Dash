@@ -1,0 +1,11 @@
+{
+  "name": "WordDashServer",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "AG & JC",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "npm install --prefix server",
+    "start": "node ./server/index.js"
+  }
+}
