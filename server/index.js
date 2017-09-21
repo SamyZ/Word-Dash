@@ -95,10 +95,7 @@ const updateOrCreateUser = (userId, socketId) => {
 
 const sendToGame = (game, event, data) => {
   info(`sendToGame: ${event} ${JSON.stringify(data)}`);
-  io
-    .to(users[game.players[0]].socketId)
-    .to(users[game.players[1]].socketId)
-    .emit(event, data);
+  io.to(users[game.players[0]].socketId).to(users[game.players[1]].socketId).emit(event, data);
 };
 
 const endGame = game => {
@@ -241,4 +238,5 @@ io.on('connection', socket => {
   });
 });
 
-server.listen(process.env.NODE_ENV === 'production' ? 80 : 3000, () => info('listening on *:3000'));
+const port = process.env.PORT || 3000;
+server.listen(port, () => info(`listening on *:${port}`));
