@@ -241,4 +241,4 @@ io.on('connection', socket => {
   });
 });
 
-server.listen(3000, () => info('listening on *:3000'));
+server.listen(process.env.NODE_ENV === 'production' ? 80 : 3000, () => info('listening on *:3000'));
