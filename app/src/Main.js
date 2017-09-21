@@ -13,12 +13,14 @@ import moment from 'moment';
 import SocketIOClient from 'socket.io-client';
 import uuid from 'react-native-unique-id';
 import Game from './Game';
+import { styles as scoreStyles } from './Score';
 
-const GAME_DURATION = 0.5 * 60 * 1000; // 2 minutes
+const GAME_DURATION = 1 * 60 * 1000; // 2 minutes
 
 export default class Main extends React.Component {
   state = {
     game: false,
+    previousGame: false,
     letters: [],
     scores: { self: 0, opponent: 0 },
     startTime: moment(),
@@ -32,7 +34,7 @@ export default class Main extends React.Component {
       this.state = { id };
       this.socket = SocketIOClient('http://172.23.0.54:3000');
       this.socket.on('connect', () => {
-        this.socket.send(id);
+        this.socket.send({ userId: id });
       });
       // opponent: scores[find(not(equals(id)), keys(scores))]
       this.socket.on('game:started', ({ letters, scores, startTime, endTime }) => {
@@ -54,6 +56,7 @@ export default class Main extends React.Component {
         this.setState({
           scores: { self: scores[id], opponent: values(dissoc(id, scores))[0] },
           game: false,
+          previousGame: true,
         });
       });
     });
@@ -76,6 +79,11 @@ export default class Main extends React.Component {
     this.socket.emit('game:readyCancel', { userId: this.state.id });
   };
 
+  handleQuit = () => {
+    this.setState({ loading: false, game: false });
+    this.socket.emit('game:quit', { userId: this.state.id });
+  };
+
   render() {
     const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
 
@@ -96,7 +104,7 @@ export default class Main extends React.Component {
         {this.state.game ? (
           <View style={styles.mainView}>
             <View style={styles.menuView}>
-              <Touchable onPress={this.handleCancel} accessibilityLabel="start">
+              <Touchable onPress={this.handleQuit} accessibilityLabel="start">
                 <View style={styles.button}>
                   <Text style={styles.buttonText}>{'MENU'}</Text>
                 </View>
@@ -111,11 +119,32 @@ export default class Main extends React.Component {
             />
           </View>
         ) : (
-          <Touchable onPress={this.handleStart} accessibilityLabel="start">
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>{'START'}</Text>
+          <View style={styles.scoresMenuView}>
+            {this.state.previousGame && (
+              <View style={styles.scoreView}>
+                <View style={styles.scoreLabelView}>
+                  <Text>{'Previous Game score'}</Text>
+                </View>
+                <View style={styles.scoreContainerView}>
+                  <View style={scoreStyles.scoreContainer}>
+                    <Text style={scoreStyles.selfText}>{'You'}</Text>
+                    <Text style={scoreStyles.selfText}>{this.state.scores.self}</Text>
+                  </View>
+                  <View style={scoreStyles.scoreContainer}>
+                    <Text style={scoreStyles.opponentText}>{'Opponent'}</Text>
+                    <Text style={scoreStyles.opponentText}>{this.state.scores.opponent}</Text>
+                  </View>
+                </View>
+              </View>
+            )}
+            <View style={styles.startButtonView}>
+              <Touchable onPress={this.handleStart} accessibilityLabel="start">
+                <View style={styles.button}>
+                  <Text style={styles.buttonText}>{'START'}</Text>
+                </View>
+              </Touchable>
             </View>
-          </Touchable>
+          </View>
         )}
       </View>
     );
@@ -134,6 +163,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 20,
+  },
+  scoresMenuView: {
+    flex: 1,
+  },
+  startButtonView: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scoreView: {
+    width: '100%',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scoreLabelView: {
+    flex: 0.3,
+    paddingTop: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scoreContainerView: {
+    width: '100%',
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   button: {
     elevation: 2,

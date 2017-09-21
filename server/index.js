@@ -17,19 +17,56 @@ const warn = msg => console.warn(msg);
 const log = msg => console.log(msg);
 const info = msg => console.info(msg);
 
-const GAME_DURATION = 2 * 60 * 1000; // 2 minutes
+const GAME_DURATION = 1 * 60 * 1000; // 2 minutes
 
 const isValidWord = word => words.check(word);
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-const randomLetter = () => LETTERS[Math.floor(Math.random() * LETTERS.length)];
+
+const LETTERS_VOCALS = 'AEIOU'.split('');
+const LETTERS_CONS = 'BCDFGHJKLMNPQRSTVWXYZ'.split('');
+
+const randomLetter = lettersArray => lettersArray[Math.floor(Math.random() * lettersArray.length)];
 
 const addWord = (word, uid) => {};
 
-const createGame = (uid1, uid2) => {
-  const letters = [];
-  for (let i = 0; i < 36; i++) {
-    letters.push(randomLetter());
+const getRandomInt = (min, max) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+};
+
+/**
+ * Shuffles array in place. ES6 version
+ * @param {Array} a items The array containing the items.
+ */
+
+const shuffle = a => {
+  for (let i = a.length; i; i--) {
+    let j = Math.floor(Math.random() * i);
+    [a[i - 1], a[j]] = [a[j], a[i - 1]];
   }
+};
+
+const generateLetters = () => {
+  let letters = [];
+
+  const vocalCount = getRandomInt(4, 7);
+  const conCount = 36 - vocalCount;
+
+  for (let i = 0; i < vocalCount; i++) {
+    letters.push(randomLetter(LETTERS_VOCALS));
+  }
+
+  for (let i = 0; i < conCount; i++) {
+    letters.push(randomLetter(LETTERS_CONS));
+  }
+
+  shuffle(letters);
+
+  return letters;
+};
+const createGame = (uid1, uid2) => {
+  const letters = generateLetters();
 
   return {
     createdAt: Date.now(),
@@ -58,7 +95,10 @@ const updateOrCreateUser = (userId, socketId) => {
 
 const sendToGame = (game, event, data) => {
   info(`sendToGame: ${event} ${JSON.stringify(data)}`);
-  io.to(users[game.players[0]].socketId).to(users[game.players[1]].socketId).emit(event, data);
+  io
+    .to(users[game.players[0]].socketId)
+    .to(users[game.players[1]].socketId)
+    .emit(event, data);
 };
 
 const endGame = game => {

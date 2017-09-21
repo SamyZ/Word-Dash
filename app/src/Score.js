@@ -49,7 +49,7 @@ export default class Score extends React.PureComponent {
   }
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 0.1,
     flexDirection: 'row',
