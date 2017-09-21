@@ -61,7 +61,7 @@ export default class Game extends React.Component {
       activeLetters.push(index);
     } else {
       letters.splice(findLastIndex(equals(letter), letters), 1);
-      activeLetters.splice(findIndex(equals(index), activeLetters));
+      activeLetters.splice(findIndex(equals(index), activeLetters), 1);
     }
     this.setState({
       letters,

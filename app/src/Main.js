@@ -32,7 +32,7 @@ export default class Main extends React.Component {
     console.ignoredYellowBox = ['Setting a timer'];
     uuid().then(id => {
       this.state = { id };
-      this.socket = SocketIOClient('http://172.23.0.54:3000');
+      this.socket = SocketIOClient('https://sheltered-ocean-27525.herokuapp.com');
       this.socket.on('connect', () => {
         this.socket.send({ userId: id });
       });
