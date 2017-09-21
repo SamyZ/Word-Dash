@@ -24,16 +24,16 @@ export default class Grid extends React.PureComponent {
   render() {
     return (
       <View style={styles.container}>
-        {this.props.lettersGrid.map((letter, index) =>
+        {this.props.lettersGrid.map((letter, index) => (
           <LetterBox
             letter={letter}
             index={index}
-            size={Math.floor(width * 0.16)}
+            size={Math.floor(width * 0.15)}
             onPress={this.props.onPress}
             key={index}
             active={!isNil(find(equals(index), this.props.activeLetters))}
           />
-        )}
+        ))}
       </View>
     );
   }
@@ -41,14 +41,14 @@ export default class Grid extends React.PureComponent {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0.8,
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'flex-start',
     justifyContent: 'center',
     borderColor: 'skyblue',
     borderWidth: 1,
-    width: Math.floor(width * 0.16) * 6 + 2,
-    maxHeight: Math.floor(width * 0.16) * 6 + 2,
+    width: Math.floor(width * 0.15) * 6 + 2,
+    maxHeight: Math.floor(width * 0.15) * 6 + 2,
   },
 });

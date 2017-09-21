@@ -8,8 +8,8 @@ import TimerMixin from 'react-timer-mixin';
 export default class Score extends React.PureComponent {
   props: {
     scores: Object,
-    startTime: Object,
-    endTime: Object,
+    startTime: number,
+    endTime: number,
   };
 
   state = { timeLeft: 0 };
@@ -18,9 +18,8 @@ export default class Score extends React.PureComponent {
 
   componentWillMount() {
     this.timer = setInterval(() => {
-      const timeLeft = Math.round(Date.now() - this.props.endTime) / 1000;
+      const timeLeft = Math.round((this.props.endTime - Date.now()) / 1000);
       if (this.state.timeLeft !== timeLeft) {
-        //Math.round(60 - moment().diff(this.props.startTime) / 1000) });
         this.setState({ timeLeft });
       }
     }, 100);
@@ -34,28 +33,16 @@ export default class Score extends React.PureComponent {
     return (
       <View style={styles.container}>
         <View style={styles.scoreContainer}>
-          <Text style={styles.selfText}>
-            {'You'}
-          </Text>
-          <Text style={styles.selfText}>
-            {this.props.scores.self}
-          </Text>
+          <Text style={styles.selfText}>{'You'}</Text>
+          <Text style={styles.selfText}>{this.props.scores.self}</Text>
         </View>
         <View style={styles.scoreContainer}>
-          <Text style={styles.timerText}>
-            {'Time left'}
-          </Text>
-          <Text style={styles.timerText}>
-            {this.state.timeLeft}
-          </Text>
+          <Text style={styles.timerText}>{'Time left'}</Text>
+          <Text style={styles.timerText}>{this.state.timeLeft}</Text>
         </View>
         <View style={styles.scoreContainer}>
-          <Text style={styles.opponentText}>
-            {'Opponent'}
-          </Text>
-          <Text style={styles.opponentText}>
-            {this.props.scores.opponent}
-          </Text>
+          <Text style={styles.opponentText}>{'Opponent'}</Text>
+          <Text style={styles.opponentText}>{this.props.scores.opponent}</Text>
         </View>
       </View>
     );
@@ -64,11 +51,11 @@ export default class Score extends React.PureComponent {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0.2,
+    flex: 0.1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    paddingBottom: 30,
+    paddingBottom: 10,
   },
   scoreContainer: {
     flex: 1,

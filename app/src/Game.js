@@ -17,7 +17,8 @@ export default class Game extends React.Component {
     lettersGrid: Array<string>,
     onSend: Function,
     scores: Object,
-    startTime: Object,
+    startTime: number,
+    endTime: number,
   };
 
   state = { letters: [], notification: null, activeLetters: [] };
@@ -72,8 +73,12 @@ export default class Game extends React.Component {
   render() {
     const Touchable = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
     return (
-      <View>
-        <Score scores={this.props.scores} startTime={this.props.startTime} />
+      <View style={styles.container}>
+        <Score
+          scores={this.props.scores}
+          startTime={this.props.startTime}
+          endTime={this.props.endTime}
+        />
         <Grid
           onPress={this.onPress}
           lettersGrid={this.props.lettersGrid}
@@ -81,13 +86,15 @@ export default class Game extends React.Component {
         />
         <View style={styles.inputContainer}>
           <View style={styles.lettersContainer}>
-            {this.state.notification
-              ? <Text style={notificationStyles(this.state.notification.type).notification}>
-                  {this.state.notification.message}
-                </Text>
-              : <Text style={styles.letters}>
-                  {this.state.letters.length ? this.state.letters.join('') : ' '}
-                </Text>}
+            {this.state.notification ? (
+              <Text style={notificationStyles(this.state.notification.type).notification}>
+                {this.state.notification.message}
+              </Text>
+            ) : (
+              <Text style={styles.letters}>
+                {this.state.letters.length ? this.state.letters.join('') : ' '}
+              </Text>
+            )}
           </View>
           <Touchable
             onPress={this.handleSend}
@@ -95,9 +102,7 @@ export default class Game extends React.Component {
             disabled={!this.state.letters}
           >
             <View style={styles.button}>
-              <Text style={styles.buttonText}>
-                {'SEND'}
-              </Text>
+              <Text style={styles.buttonText}>{'SEND'}</Text>
             </View>
           </Touchable>
         </View>
@@ -107,12 +112,15 @@ export default class Game extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 0.9,
+  },
   inputContainer: {
     flex: 0.3,
     alignItems: 'center',
   },
   lettersContainer: {
-    padding: 20,
+    padding: 14,
   },
   letters: {
     fontSize: 25,
@@ -127,7 +135,7 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontWeight: '500',
-    padding: 10,
+    padding: 8,
   },
 });
 
