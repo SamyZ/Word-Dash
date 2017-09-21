@@ -4,7 +4,7 @@ const socketio = require('socket.io');
 const uuid = require('uuid/v4');
 //https://github.com/S0c5/node-check-word
 const words = require('check-word')('en');
-const { find, isNil, whereEq } = require('ramda');
+const { find, isNil, reject } = require('ramda');
 
 const app = express();
 const server = http.Server(app);
@@ -41,7 +41,7 @@ const createGame = (uid1, uid2) => {
   };
 };
 
-const availablePlayers = [];
+let availablePlayers = [];
 
 // persistence? https://www.npmjs.com/package/node-persist
 
@@ -116,6 +116,22 @@ io.on('connection', socket => {
     }
   });
 
+  socket.on('game:readyCancel', () => {
+    if (!user || !user.id) {
+      err('game:readyCancel without a user');
+      return;
+    }
+    const playerId = user.id;
+    if (user.gameId) {
+      err(`game:readyCancel from ${playerId} but a game already exists`);
+      return;
+    }
+    const beforeCount = availablePlayers.length;
+    availablePlayers = reject(id => id === playerId, availablePlayers);
+    const afterCount = availablePlayers.length;
+    info(`game:readyCancel available players reduced from ${beforeCount} to ${afterCount}`);
+  });
+
   socket.on('game:ready', () => {
     if (!user) {
       warn('game:ready without a user');
@@ -125,30 +141,32 @@ io.on('connection', socket => {
       warn(`game:ready and user ${user.id} has no game`);
       return;
     }
-    info(`game:ready by ${user.id}, available players: ${availablePlayers.length}`);
+    const beforeCount = availablePlayers.length;
 
     const playerId = user.id;
 
     // not enough players :(
     if (!availablePlayers.length) {
-      return availablePlayers.push(playerId);
+      availablePlayers.push(playerId);
+    } else {
+      // we have 2 players, let the game begin...
+      const opponentId = availablePlayers.shift();
+
+      const game = createGame(playerId, opponentId);
+      const gameId = games.push(game) - 1;
+      users[playerId].gameId = gameId;
+      users[opponentId].gameId = gameId;
+
+      sendToGame(game, 'game:started', {
+        endTime: game.createdAt + GAME_DURATION,
+        letters: game.letters,
+        players: game.players,
+        scores: game.scores,
+        startTime: game.createdAt,
+      });
     }
-
-    // we have 2 players, let the game begin...
-    const opponentId = availablePlayers.shift();
-
-    const game = createGame(playerId, opponentId);
-    const gameId = games.push(game) - 1;
-    users[playerId].gameId = gameId;
-    users[opponentId].gameId = gameId;
-
-    sendToGame(game, 'game:started', {
-      endTime: game.createdAt + GAME_DURATION,
-      letters: game.letters,
-      players: game.players,
-      scores: game.scores,
-      startTime: game.createdAt,
-    });
+    const afterCount = availablePlayers.length;
+    info(`game:ready changed available players from ${beforeCount} to ${afterCount}`);
   });
 
   socket.on('game:word', (word, fn) => {

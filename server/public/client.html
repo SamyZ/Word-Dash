@@ -7,6 +7,7 @@
   <body>
     <h1>just use socket in the console!</h1>
     <button id="start">start</button>
+    <button id="cancel">cancel</button>
     <button id="quit">quit</button>
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
@@ -36,6 +37,7 @@
       });
 
       $('#start').on('click', () => socket.emit('game:ready'))
+      $('#cancel').on('click', () => socket.emit('game:readyCancel'))
       $('#quit').on('click', () => socket.emit('game:quit'))
 
     </script>
