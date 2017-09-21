@@ -9,16 +9,25 @@ export default class Score extends React.PureComponent {
   props: {
     scores: Object,
     startTime: Object,
+    endTime: Object,
   };
 
-  state = { timeLeft: 60 };
+  state = { timeLeft: 0 };
 
   mixins: [TimerMixin];
 
-  componentDidMount() {
-    setInterval(() => {
-      this.setState({ timeLeft: Math.round(60 - moment().diff(this.props.startTime) / 1000) });
+  componentWillMount() {
+    this.timer = setInterval(() => {
+      const timeLeft = Math.round(Date.now() - this.props.endTime) / 1000;
+      if (this.state.timeLeft !== timeLeft) {
+        //Math.round(60 - moment().diff(this.props.startTime) / 1000) });
+        this.setState({ timeLeft });
+      }
     }, 100);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   render() {

@@ -28,7 +28,7 @@ export default class Main extends React.Component {
     console.ignoredYellowBox = ['Setting a timer'];
     uuid().then(id => {
       this.state = { id };
-      this.socket = SocketIOClient('http://172.23.0.200:3000');
+      this.socket = SocketIOClient('http://172.23.0.117:3000');
       this.socket.on('connect', () => {
         this.socket.send(id);
       });
@@ -100,6 +100,7 @@ export default class Main extends React.Component {
               onSend={this.handleSend}
               scores={this.state.scores}
               startTime={this.state.startTime}
+              endTime={this.state.endTime}
             />
           : <Touchable onPress={this.handleStart} accessibilityLabel="start">
               <View style={styles.button}>
