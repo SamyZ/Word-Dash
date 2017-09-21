@@ -31,12 +31,12 @@
 
       socket.on('game:started', () => { alert('game started!'); });
 
-      socket.on('game:finished', ({ outcome, ownScore, opponentScore }) => {
+      socket.on('game:over', ({ outcome, ownScore, opponentScore }) => {
         alert('game finished! you ' + outcome + '; your score: ' + ownScore + '; opponent score: ' + opponentScore);
       });
 
-      $('#start').on('click', socket.emit('game:start'))
-      $('#quit').on('click', socket.emit('game:quit'))
+      $('#start').on('click', () => socket.emit('game:ready'))
+      $('#quit').on('click', () => socket.emit('game:quit'))
 
     </script>
   </body>
